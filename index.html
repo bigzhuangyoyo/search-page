@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>zhelper Search Page 搜索界面 🔍</title>
+    <meta name="description" content="zhelper Search Page 搜索界面 🔍">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7692266966719684"
+        crossorigin="anonymous"></script>
+    <link href="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/bootstrap/5.1.3/css/bootstrap.min.css" type="text/css"
+        rel="stylesheet" />
+    <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/bootstrap/5.1.3/js/bootstrap.bundle.min.js"
+        type="application/javascript"></script>
+    <script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/axios/0.26.0/axios.min.js"
+        type="application/javascript"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Manrope">
+    <script src="https://lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/vue/3.2.31/vue.global.min.js"
+        type="application/javascript"></script>
+</head>
+
+<body>
+    <div>
+        <div class="container" id="app">
+            <nav class="navbar navbar-expand-lg  navbar-light">
+                <div class="container-fluid">
+                    <b>zhelper</b>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false"
+                        aria-label="Toggle navigation">
+                        展开
+                    </button>
+                    <div class="collapse navbar-collapse pull-right" id="navbarTogglerDemo02">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="#">{{language.home}}</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#">{{language.doc}}</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                    {{language.changeapi}}
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                    <li v-for="api in apis" class="dropdown-item" :key="api.id"
+                                        @click="changeapi(api.url)">
+                                        {{api.name}}
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+            <div class="d-grid gap-2 d-flex justify-content-center">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="" @keyup.enter="search" v-model="keyword">
+                    <button class="btn btn-primary" @click="search">搜索</button>
+                </div>
+            </div>
+
+            <div class="my-5 mx-auto">
+                <ol class="list-group list-group-flush">
+                    <a v-for="result in search_result" @click="get_detail(result.id)"
+                        class=" list-group-item list-group-item-action " aria-current="true" style="text-align: left">
+                        <div class="ms-2 align-items-start" style="text-align: start;">
+                            <b class="card-title">{{result.title}}</b>
+                            {{language.author}}：{{result.author}}，{{language.publisher}}：{{result.publisher}}，{{language.year}}：{{result.year}}
+                            <br>
+                            <p class="fw-light">
+                                <small>
+                                    {{language.filesize}}：{{filesizeToString(result.filesize)}}，ID：{{result.id}}，ISBN：{{result.isbn}}，{{language.extension}}：{{result.extension}}
+                                </small>
+                            </p>
+                        </div>
+                    </a>
+                </ol>
+            </div>
+            <nav aria-label="Page navigation example" v-if="search_result.length">
+                <ul class="pagination justify-content-center">
+                    
+                    <li v-if="page-1" class="page-item">
+                        <a class="page-link" href="#" @click="change_page(-1)">前一页</a>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="#">{{page}}</a></li>
+                    <li v-if="page!= total_page" class="page-item" > 
+                        <a class="page-link" href="#"  @click="change_page(1)">后一页</a>
+                    </li>
+                </ul>
+            </nav>
+            <div>
+            <div v-if="is_homepage"></div>
+
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg ">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">详细结果</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                        </div>
+                        <div class="modal-body">
+                            {{language.title}}：{{detail.title}}
+                            <br>
+                            {{language.author}}：{{detail.author}}，{{language.publisher}}：{{detail.publisher}}，{{language.year}}：{{detail.year}}
+                            <br>
+                            MD5： {{detail.md5}}
+                            <br>
+                            {{language.filesize}}：{{detail.filesize}}
+                            <p></p>
+                            <div class="modal-footer">
+                                <a v-if="detail.in_libgen" class="btn btn-secondary"
+                                    :href="'http://libgendown.1kbtool.com/'+detail.md5">
+                                    Libgen
+                                </a>
+                                <a v-if="detail.ipfs_cid !== null" class="btn btn-secondary"
+                                    :href="'https://ipfs-checker.1kbtool.com/'+detail.ipfs_cid+'?filename='+detail.title+'_'+detail.author+'.'+detail.extension">
+                                    IPFS
+                                </a>
+                                <a class="btn btn-secondary"
+                                    :href="'https://rapidupload.1kbtool.com/'+detail.md5 + '#' + detail.filesize + '#' + detail.title + '_' + detail.author + '.' + detail.extension">
+                                    秒传
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+                <div class="col-md-4 d-flex text-center" style="margin-left: 4px">
+                    <span class="mb-3 mb-md-0 text-muted  text-center">© 2022 Zhelper Team</span>
+                </div>
+            </footer>
+        </div>
+
+        <script async
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7692266966719684"
+            crossorigin="anonymous"></script>
+        <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-7692266966719684"
+            data-ad-slot="3408254862" data-ad-format="auto" data-full-width-responsive="true"></ins>
+        <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+
+        <script>
+
+            function getCookie(name) {
+                // 拆分 cookie 字符串
+                var cookieArr = document.cookie.split(";");
+
+                // 循环遍历数组元素
+                for (var i = 0; i < cookieArr.length; i++) {
+                    var cookiePair = cookieArr[i].split("=");
+
+                    /* 删除 cookie 名称开头的空白并将其与给定字符串进行比较 */
+                    if (name == cookiePair[0].trim()) {
+                        // 解码cookie值并返回
+                        return decodeURIComponent(cookiePair[1]);
+                    }
+                }
+                // 如果未找到，则返回null
+                return null;
+            }
+
+            const app = Vue.createApp({
+                data() {
+                    return {
+                        inprogress: false,
+                        api_url: 'https://cors-anywhere.1kbtool.com/?https://api.v5.zhelper.net',
+                        language: {
+                            changeapi: '切换API',
+                            home: '返回首页',
+                            doc: '查看文档',
+                            title: '书名',
+                            author: '作者',
+                            publisher: '出版社',
+                            year: '出版时间',
+                            filesize: '文件大小',
+                            extension: '文件类型'
+                        },
+                        apis: [
+                            { name: 'zhelper V4', 'url': 'https://api.v4.zhelper.net' },
+                            { name: 'ylibrary', 'url': 'https://api.ylibrary.org' }
+                        ],
+                        search_result: [],
+                        detail: {},
+                        keyword: '',
+                        hits: 0,
+                        page:1,
+                    }
+                },
+                methods: {
+                    changeapi(url) {
+                        this.api_url = url
+                    },
+                    search() {
+                        this.page = 1;
+                        this.inprogress = true;
+                        axios.post(this.api_url + '/api/search/', {
+                            keyword: this.keyword,
+                            page: this.page
+                        }).then(response => {
+                            this.search_result = response.data.data
+                            this.hits = response.data.hits
+                        }).catch(error => {
+                            console.log(error)
+                        })
+                        this.inprogress = false;
+                    },
+                    change_page(change) {
+                        this.page += change
+                        axios.post(this.api_url + '/api/search/', {
+                            keyword: this.keyword,
+                            page: this.page
+                        }).then(response => {
+                            this.search_result = response.data.data
+                        }).catch(error => {
+                            console.log(error)
+                        })
+                    },
+                    get_detail(id) {
+                        axios.post(this.api_url + '/api/detail/', {
+                            id: id
+                        }).then(response => {
+                            this.detail = response.data
+                        }).catch(error => {
+                            console.log(error)
+                        })
+                        var myModal = new bootstrap.Modal(document.getElementById('exampleModal'), {})
+                        myModal.toggle()
+                    },
+                    filesizeToString(filesize) {
+                        if (filesize > 0 && filesize < 1) {
+                            return (filesize * 8).toFixed(2).toString() + 'b'
+                        } else if (filesize <= 1024) {
+                            return filesize.toFixed(2).toString() + 'B'
+                        } else if (filesize <= Math.pow(1024, 2)) {
+                            return (filesize / 1024).toFixed(2).toString() + 'KB'
+                        } else if (filesize <= Math.pow(1024, 3)) {
+                            return (filesize / Math.pow(1024, 2)).toFixed(2).toString() + 'MB'
+                        }
+                    }
+                },
+                computed: {
+                    is_homepage() {
+                        return location.path == '/'
+                    },
+                    total_page() {
+                        return Math.floor(this.hits/20)+1
+                    },
+                }
+            })
+            app.mount('#app')
+
+        </script>
+</body>
+
+</html>
