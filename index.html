@@ -242,8 +242,8 @@
                             apis: [
                                 { name: 'zhelper V5', url: 'https://api.v5.zhelper.net', type: 'full', sensitive: true, detail: true },
                                 { name: 'Mibooks', url: 'https://api.mibooks.tk', type: 'full', sensitive: true, detail: false },
-                                { name: 'ylibrary', url: 'https://api.ylibrary.org', type: 'full', sensitive: true, detail: true },
-                                { name: 'bookpan', url: 'https://api.bookpan.net', type: 'light', sensitive: true, detail: true },
+                                { name: 'Ylibrary', url: 'https://api.ylibrary.org', type: 'full', sensitive: true, detail: true },
+                                //{ name: 'bookpan', url: 'https://api.bookpan.net', type: 'light', sensitive: true, detail: true },
                             ],
                             search_result: [],
                             detail: {},
@@ -291,7 +291,8 @@
                         get_detail(item) {
                             if(this.api.detail){
                                 axios.post(this.api.url + '/api/detail/', {
-                                    id: item.id
+                                    id: item.id,
+                                    source: item.source
                                 }).then(response => {
                                     if (response.data.errorn) {
                                         alert(response.data.msg)
