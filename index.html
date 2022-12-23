@@ -47,6 +47,9 @@
                                      {{api.name}}
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                    <li v-if="noapi" class="dropdown-item">
+                                        {{language.noapi}}
+                                    </li>
                                     <li v-for="api in apis" class="dropdown-item" :key="api.id" @click="changeapi(api)">
                                         {{api.name}}
                                     </li>
@@ -236,15 +239,11 @@
                                 filesize: '文件大小',
                                 extension: '文件类型',
                                 source: '书源',
-                                info: '信息'
+                                info: '信息',
+                                noapi:'无可用API'
                             },
-                            api: { name: 'zhelper V5', url: 'https://api.v5.zhelper.net', type: 'full', sensitive: true,detail:true },
-                            apis: [
-                                { name: 'zhelper V5', url: 'https://api.v5.zhelper.net', type: 'full', sensitive: true, detail: true },
-                                { name: 'Mibooks', url: 'https://api.mibooks.tk', type: 'full', sensitive: true, detail: false },
-                                { name: 'Ylibrary', url: 'https://api.ylibrary.org', type: 'full', sensitive: true, detail: true },
-                                //{ name: 'bookpan', url: 'https://api.bookpan.net', type: 'light', sensitive: true, detail: true },
-                            ],
+                            api: {},
+                            apis: [],
                             search_result: [],
                             detail: {},
                             keyword: '',
@@ -327,15 +326,17 @@
                         is_homepage() {
                             return location.pathname == '/'
                         },
+                        noapi() {
+                            return this.apis.length == 0
+                        },
                         total_page() {
                             return Math.floor(this.hits / 20) + 1
                         },
                     },
-                    //mounted: function(){
-                    //    let config = JSON.parse(decodeURI(location.search.slice(1)));
-                    //    this.download_config = config.download_config;
-                    //    console.log(config.download_config)
-                    //}
+                    mounted: function(){
+                        this.apis = JSON.parse(decodeURI(location.search.slice(1)));
+                        this.api = this.apis[0]
+                    }
                 })
                 app.mount('#app')
 
