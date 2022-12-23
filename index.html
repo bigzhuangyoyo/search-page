@@ -292,7 +292,7 @@
                     },
                     computed: {
                         is_homepage() {
-                            return location.path == '/'
+                            return location.pathname == '/'
                         },
                         total_page() {
                             return Math.floor(this.hits / 20) + 1
