@@ -273,7 +273,12 @@
                                     this.hits = response.data.hits
                                 }
                             }).catch(error => {
-                                console.log(error)
+                                if(error.toJSON().status==429){
+                                    alert('请求过于频繁，请稍等一下再次尝试(429)')
+                                }
+                                else{
+                                    alert(`未知错误，请打开控制台查看(${error.message})`)
+                                }
                             })
                             this.inprogress = false;
                         },
@@ -286,7 +291,12 @@
                             }).then(response => {
                                 this.search_result = response.data.data
                             }).catch(error => {
-                                console.log(error)
+                                if(error.toJSON().status==429){
+                                    alert('请求过于频繁，请稍等一下再次尝试(429)')
+                                }
+                                else{
+                                    alert(`未知错误，请打开控制台查看(${error.message})`)
+                                }
                             })
                         },
                         get_detail(item) {
@@ -303,7 +313,12 @@
                                     }
     
                                 }).catch(error => {
-                                    console.log(error)
+                                    if(error.toJSON().status==429){
+                                        alert('请求过于频繁，请稍等一下再次尝试(429)')
+                                    }
+                                    else{
+                                        alert(`未知错误，请打开控制台查看(${error.message})`)
+                                    }
                                 })
                             }
                             else{
