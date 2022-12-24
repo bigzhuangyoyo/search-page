@@ -301,6 +301,9 @@
                         }
                         else {
                             this.search_result = response.data.data
+                            if(response.data.data.length == 0){
+                                alert('无相关结果')
+                            }
                             this.hits = response.data.hits
                         }
                     }).catch(error => {
