@@ -159,12 +159,12 @@
                                             Libgen
                                         </a>
                                         <a v-if="detail.ipfs_cid !== null && detail.ipfs_cid" class="btn btn-secondary"
-                                            :href="'https://ipfs-checker.1kbtool.com/'+detail.ipfs_cid+'?filename='+detail.title+'_'+detail.author+'.'+detail.extension"
+                                            :href="'https://ipfs-checker.1kbtool.com/'+detail.ipfs_cid+'?filename='+detail.title+'_'+detail.author+'_zhelper-search.'+detail.extension"
                                             target="_blank">
                                             IPFS
                                         </a>
                                         <a v-if="detail.md5" class="btn btn-secondary"
-                                            :href="'https://rapidupload.1kbtool.com/'+detail.md5 + '#' + detail.filesize + '#' + detail.title + '_' + detail.author + '.' + detail.extension"
+                                            :href="'https://rapidupload.1kbtool.com/'+detail.md5 + '#' + detail.filesize + '#' + detail.title + '_' + detail.author + '_zhelper-search.' + detail.extension"
                                             target="_blank">
                                             秒传
                                         </a>
